@@ -10,6 +10,7 @@ import axios from "axios";
 
 
 const eventBaseUrl = "http://localhost:8080/forum/discussions";
+const months = ["JAN", "FEB", "MAR","APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 class DiscussionForum extends React.Component {
   state = {
     allPosts: []
@@ -22,7 +23,7 @@ class DiscussionForum extends React.Component {
     axios.get(eventBaseUrl).then((res) => {
       const postArray=[];
       res.data.map((index)=>{
-        postArray.push({name:index.username,content:index.text, date: new Date('01 Jan 2020 09:12:00 GMT')})
+        postArray.push({name:index.username,content:index.text, date:new Date(index.time)})
       })
       this.setState({allPosts:postArray})
     });
@@ -32,13 +33,20 @@ class DiscussionForum extends React.Component {
       const {
         allPosts
       } = this.state;
-    const curDate = new Date()
-    this.setState({allPosts:[...allPosts,{name:'bala',content:text,date:curDate}]})
+     
+      let current_datetime = new Date()
+      let currentHours = current_datetime.getHours();
+      currentHours = ("0" + currentHours).slice(-2);
+      let formatted_date = current_datetime.getDate() + " " + months[current_datetime.getMonth()]+" "+ current_datetime.getFullYear() + " "+  currentHours + ":" + current_datetime.getMinutes() + ":" + current_datetime.getSeconds() 
+      console.log(formatted_date)
+      const finalDate = new Date(formatted_date);
+      console.log('finalDate',finalDate)
+    this.setState({allPosts:[...allPosts,{name:'bala',content:text,date:finalDate}]})
     const params = {
        text:text,
        username:'bala',
        userId:'123',
-       time:curDate
+       time:finalDate
     }
 
     axios.post(eventBaseUrl,params).then((res) => {
@@ -49,7 +57,7 @@ class DiscussionForum extends React.Component {
   render(){
    const{allPosts} = this.state;
     return (
-      <div className='App'>
+      <div className='App' style={{'margin-top':'36px'}}>
         <DiscussionBoard posts={allPosts} onSubmit={this.submitPost} />
       </div>
     )
