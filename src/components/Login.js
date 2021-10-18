@@ -14,6 +14,7 @@ class Login extends React.Component {
       username: "",
       password: "",
       shouldAlertDisplay: false,
+      shouldLoginErrorDisplay:false
     };
   }
 
@@ -35,11 +36,12 @@ class Login extends React.Component {
       return;
     }
     this.setState({ shouldAlertDisplay: false });
+    this.setState({ shouldLoginErrorDisplay: false });
     const reqJson={
       username:username,password:password
     }
     axios.post(eventBaseUrl,reqJson).then((res) => {
-     if(res)
+     if(res.data)
      {
        localStorage.setItem("username",username)
       push({
@@ -47,11 +49,14 @@ class Login extends React.Component {
         username: username, // your data array of objects
       });
      }
+     if(!res.data){
+       this.setState({shouldLoginErrorDisplay: true})
+     }
     });
   };
 
   render() {
-    const { username, password, shouldAlertDisplay } = this.state;
+    const { username, password, shouldAlertDisplay,shouldLoginErrorDisplay } = this.state;
     return (
       <div className="flex flex-col space-y-5 max-w-md mx-auto my-16 min-w-500">
         <div className="flex items-center justify-between">
@@ -86,6 +91,9 @@ class Login extends React.Component {
         </Button>
         {shouldAlertDisplay && (
           <Alert severity="error">Field cannot be empty</Alert>
+        )}
+        {shouldLoginErrorDisplay && (
+          <Alert severity="error">Invalid username or password</Alert>
         )}
       </div>
     );

@@ -17,6 +17,9 @@ class Signup extends React.Component {
       phoneNumber: "",
       password: "",
       shouldAlertDisplay: false,
+      shouldErrorMessageDisplay: false,
+      signupErrorMessage:""
+
     };
   }
 
@@ -50,8 +53,6 @@ class Signup extends React.Component {
       this.setState({ shouldAlertDisplay: true });
       return;
     }
-    this.setState({ shouldAlertDisplay: false });
-   
     const reqJson={
      username:username,
      password:password,
@@ -59,16 +60,23 @@ class Signup extends React.Component {
        phone:phoneNumber
     }
     axios.post(eventBaseUrl,reqJson).then((res) => {
-      if(res)
+      if(res.data.isRegistered)
       {
         push('/');
+      }
+      if(!res.data.isRegistered){
+       this.setState({
+        signupErrorMessage:res.data.error,
+        shouldErrorMessageDisplay:true
+       }) 
       }
     });
   };
 
   render() {
-    const { username, email, phoneNumber, password, shouldAlertDisplay } =
+    const { username, email, phoneNumber, password, shouldAlertDisplay,shouldErrorMessageDisplay,signupErrorMessage } =
       this.state;
+      
     return (
       <div className="flex flex-col space-y-5 max-w-md mx-auto my-16 min-w-500">
         <h2 className="text-4xl font-semibold text-blue-800">Signup</h2>
@@ -113,9 +121,13 @@ class Signup extends React.Component {
             </Link>
           </div>
         </div>
-        {shouldAlertDisplay && (
+        {shouldAlertDisplay &&
           <Alert severity="error">Field cannot be empty</Alert>
-        )}
+        }
+         {shouldErrorMessageDisplay &&
+          <Alert severity="error"> {signupErrorMessage} </Alert>
+        }
+        
       </div>
     );
   }

@@ -46,6 +46,7 @@ const styles = theme => ({
       },
       title: {
         fontSize: 14,
+        fontWeight: 700
       },
       pos: {
         marginBottom: 12,
@@ -58,8 +59,10 @@ class EventCard extends React.Component {
     showCard:true
   }
 
-  handleButtonOnclick=()=>{
+  handleButtonOnclick=(eventDetailsData)=>{
     this.setState({showCard:false})
+    this.props.isDisplayCard(false,eventDetailsData);
+
   }
   handleBack=()=>{
     this.setState({showCard:true})
@@ -92,7 +95,7 @@ class EventCard extends React.Component {
      
     </CardContent>
     <CardActions style={{backgroundColor:'lavender'}}>
-      <Button size="small" onClick={this.handleButtonOnclick}>View Participants</Button>
+      <Button size="small" onClick={e=>this.handleButtonOnclick(eventDetailsData)}>View Participants</Button>
     </CardActions>
   </Card>:
   <div style={{'margin-top': 36}}>
@@ -103,6 +106,8 @@ class EventCard extends React.Component {
       <TableRow>
         <StyledTableCell>Participant Name</StyledTableCell>
         <StyledTableCell align="center">Event ID</StyledTableCell>
+        {/* <StyledTableCell align="center">Event Name</StyledTableCell>
+        <StyledTableCell align="center">Event Location</StyledTableCell> */}
       </TableRow>
     </TableHead>
     <TableBody>
@@ -112,6 +117,9 @@ class EventCard extends React.Component {
             {row.name}
           </StyledTableCell>
           <StyledTableCell align="center">{row.eventId}</StyledTableCell>
+          {/* <StyledTableCell align="center">{eventDetailsData.name}</StyledTableCell>
+          <StyledTableCell align="center">{eventDetailsData.location}</StyledTableCell> */}
+
         </StyledTableRow>
       ))}
     </TableBody>
