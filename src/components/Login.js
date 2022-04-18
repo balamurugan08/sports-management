@@ -6,7 +6,7 @@ import Alert from "@mui/material/Alert";
 import { withRouter } from "react-router";
 import axios from "axios";
 
-const eventBaseUrl = "http://localhost:8080/user/login";
+const eventBaseUrl = "http://52.0.123.213:8080/user/login";
 class Login extends React.Component {
   constructor(props) {
     super(props);
@@ -41,15 +41,16 @@ class Login extends React.Component {
       username:username,password:password
     }
     axios.post(eventBaseUrl,reqJson).then((res) => {
-     if(res.data)
+     if(res.data.loginStatus)
      {
        localStorage.setItem("username",username)
+       localStorage.setItem("userId",res.data.userId)
       push({
         pathname: "/home",
-        username: username, // your data array of objects
+        username: username, 
       });
      }
-     if(!res.data){
+     if(!res.data.loginStatus){
        this.setState({shouldLoginErrorDisplay: true})
      }
     });
@@ -86,7 +87,7 @@ class Login extends React.Component {
           value={password}
           onChange={(e) => this.handlePasswordChange(e)}
         />
-        <Button variant="contained" onClick={this.handleLogin}>
+        <Button  style={{borderRadius:'16px'}} variant="contained" onClick={this.handleLogin}>
           Login
         </Button>
         {shouldAlertDisplay && (

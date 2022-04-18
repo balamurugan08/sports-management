@@ -6,7 +6,7 @@ import Alert from "@mui/material/Alert";
 import { withRouter } from "react-router";
 import axios from "axios";
 
-const eventBaseUrl = "http://localhost:8080/user/register";
+const eventBaseUrl = "http://52.0.123.213:8080/user/register";
 
 class Signup extends React.Component {
   constructor(props) {
@@ -18,7 +18,9 @@ class Signup extends React.Component {
       password: "",
       shouldAlertDisplay: false,
       shouldErrorMessageDisplay: false,
-      signupErrorMessage:""
+      signupErrorMessage:"",
+      isEmailError:false,
+      isNumberError:false
 
     };
   }
@@ -53,12 +55,30 @@ class Signup extends React.Component {
       this.setState({ shouldAlertDisplay: true });
       return;
     }
+    const isEmailError = this.checkEmailError(email);
+    const isPhoneError = this.checkPhoneError(phoneNumber);
+    if(!isEmailError){
+      this.setState({isEmailError: true});
+    }else{
+      this.setState({isEmailError: false});
+    }
+    if(!isPhoneError){
+      this.setState({isNumberError: true});
+    }else{
+      this.setState({isNumberError: false});
+    }
+
+    if(!isEmailError || !isPhoneError){
+      return;
+    }
+
     const reqJson={
      username:username,
      password:password,
       email:email,
        phone:phoneNumber
     }
+   
     axios.post(eventBaseUrl,reqJson).then((res) => {
       if(res.data.isRegistered)
       {
@@ -73,8 +93,19 @@ class Signup extends React.Component {
     });
   };
 
+  checkEmailError =(email) =>{
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  }
+
+  checkPhoneError =(number) =>{
+    const re = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+    return re.test(String(number).toLowerCase());
+  }
+
+
   render() {
-    const { username, email, phoneNumber, password, shouldAlertDisplay,shouldErrorMessageDisplay,signupErrorMessage } =
+    const { username, email, phoneNumber, password, shouldAlertDisplay,shouldErrorMessageDisplay,signupErrorMessage, isEmailError,isNumberError} =
       this.state;
       
     return (
@@ -89,18 +120,22 @@ class Signup extends React.Component {
           onChange={(e) => this.handleUsernameChange(e)}
         />
         <TextField
+          error={isEmailError}
           required
           id="outlined-email"
           value={email}
           label="Email"
           onChange={(e) => this.handleEmailChange(e)}
+          helperText={isEmailError ?"Invalid Email":''}
         />
         <TextField
+          error={isNumberError}
           required
           id="outlined-phone"
           value={phoneNumber}
           label="Phone Number"
           onChange={(e) => this.handlePhoneNumberChange(e)}
+          helperText={isNumberError?"Invalid Phone Number":''}
         />
         <TextField
           value={password}
